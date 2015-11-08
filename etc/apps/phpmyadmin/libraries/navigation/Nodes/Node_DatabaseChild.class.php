@@ -25,16 +25,16 @@ abstract class Node_DatabaseChild extends Node
     {
         $ret = '';
         $cfgRelation = PMA_getRelationsParam();
-        if ($cfgRelation['navwork']) {
+        if (isset($cfgRelation['navwork']) && $cfgRelation['navwork']) {
             $db   = $this->realParent()->real_name;
             $item = $this->real_name;
             $ret  = '<span class="navItemControls">'
-                . '<a href="navigation.php?'
+                . '<a href="navigation.php'
                 . PMA_URL_getCommon()
                 . '&hideNavItem=true'
-                . '&itemType=' . urldecode($this->getItemType())
-                . '&itemName=' . urldecode($item)
-                . '&dbName=' . urldecode($db) . '"'
+                . '&itemType=' . urlencode($this->getItemType())
+                . '&itemName=' . urlencode($item)
+                . '&dbName=' . urlencode($db) . '"'
                 . ' class="hideNavItem ajax">'
                 . PMA_Util::getImage('lightbulb_off.png', __('Hide'))
                 . '</a></span>';
@@ -43,7 +43,7 @@ abstract class Node_DatabaseChild extends Node
     }
 
     /**
-     * Returns the type of the item reprsented by the node.
+     * Returns the type of the item represented by the node.
      *
      * @return string type of the item
      */

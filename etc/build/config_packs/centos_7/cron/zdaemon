@@ -1,0 +1,6 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/bin:/usr/sbin
+MAILTO=root
+HOME=/
+MANPATH=/usr/share/man:${MANPATH}
+*/5 * * * * root nice -2 /usr/bin/php -q /etc/zpanel/panel/bin/daemon.php >> /dev/null 2>&1

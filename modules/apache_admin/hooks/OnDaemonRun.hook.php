@@ -1,3 +1,6 @@
+# this is for the ubuntu ver 14.04 LTS
+# so the apache works with the vhosts / control panel :)
+#ZcWorld (Shane E) / 2014 / zcworld.net 
 <?php
 
 echo fs_filehandler::NewLine() . "START Apache Config Hook." . fs_filehandler::NewLine();
@@ -90,9 +93,9 @@ function WriteVhostConfigFile()
     $line .= "" . fs_filehandler::NewLine();
 
     // ZPanel default virtual host container
-    $line .= "NameVirtualHost *:" . ctrl_options::GetSystemOption( 'apache_port' ) . "" . fs_filehandler::NewLine();
+    $line .= "#NameVirtualHost *:" . ctrl_options::GetSystemOption( 'apache_port' ) . "" . fs_filehandler::NewLine();
     foreach ( $customPortList as $port ) {
-        $line .= "NameVirtualHost *:" . $port . "" . fs_filehandler::NewLine();
+        $line .= "#NameVirtualHost *:" . $port . "" . fs_filehandler::NewLine();
     }
     $line .= "" . fs_filehandler::NewLine();
     $line .= "# Configuration for ZPanel control panel." . fs_filehandler::NewLine();
@@ -104,7 +107,8 @@ function WriteVhostConfigFile()
     // $line .= "ServerAlias *." . ctrl_options::GetSystemOption( 'zpanel_domain' ) . "" . fs_filehandler::NewLine();
     $line .= "AddType application/x-httpd-php .php" . fs_filehandler::NewLine();
     $line .= "<Directory \"" . ctrl_options::GetSystemOption( 'zpanel_root' ) . "\">" . fs_filehandler::NewLine();
-    $line .= "Options FollowSymLinks" . fs_filehandler::NewLine();
+    $line .= "Options +FollowSymLinks" . fs_filehandler::NewLine();
+    $line .= "Require all granted" . fs_filehandler::NewLine();  
     $line .= "	AllowOverride All" . fs_filehandler::NewLine();
     $line .= "	Order allow,deny" . fs_filehandler::NewLine();
     $line .= "	Allow from all" . fs_filehandler::NewLine();
@@ -200,7 +204,8 @@ function WriteVhostConfigFile()
                 $line .= "ServerAdmin " . $useremail . fs_filehandler::NewLine();
                 $line .= "DocumentRoot \"" . ctrl_options::GetSystemOption( 'static_dir' ) . "diskexceeded\"" . fs_filehandler::NewLine();
                 $line .= "<Directory />" . fs_filehandler::NewLine();
-                $line .= "Options FollowSymLinks Indexes" . fs_filehandler::NewLine();
+                $line .= "Options +FollowSymLinks +Indexes" . fs_filehandler::NewLine();
+                $line .= "Require all granted" . fs_filehandler::NewLine();
                 $line .= "AllowOverride All" . fs_filehandler::NewLine();
                 $line .= "Order Allow,Deny" . fs_filehandler::NewLine();
                 $line .= "Allow from all" . fs_filehandler::NewLine();
@@ -234,7 +239,8 @@ function WriteVhostConfigFile()
                 $line .= "ServerAdmin " . $useremail . fs_filehandler::NewLine();
                 $line .= "DocumentRoot \"" . ctrl_options::GetSystemOption( 'static_dir' ) . "bandwidthexceeded\"" . fs_filehandler::NewLine();
                 $line .= "<Directory />" . fs_filehandler::NewLine();
-                $line .= "Options FollowSymLinks Indexes" . fs_filehandler::NewLine();
+                $line .= "Options +FollowSymLinks +Indexes" . fs_filehandler::NewLine();
+                $line .= "Require all granted" . fs_filehandler::NewLine();
                 $line .= "AllowOverride All" . fs_filehandler::NewLine();
                 $line .= "Order Allow,Deny" . fs_filehandler::NewLine();
                 $line .= "Allow from all" . fs_filehandler::NewLine();
@@ -267,7 +273,8 @@ function WriteVhostConfigFile()
                 $line .= "ServerAdmin " . $useremail . fs_filehandler::NewLine();
                 $line .= "DocumentRoot \"" . ctrl_options::GetSystemOption( 'parking_path' ) . "\"" . fs_filehandler::NewLine();
                 $line .= "<Directory />" . fs_filehandler::NewLine();
-                $line .= "Options FollowSymLinks Indexes" . fs_filehandler::NewLine();
+                $line .= "Options +FollowSymLinks +Indexes" . fs_filehandler::NewLine();
+                $line .= "Require all granted" . fs_filehandler::NewLine();
                 $line .= "AllowOverride All" . fs_filehandler::NewLine();
                 $line .= "Order Allow,Deny" . fs_filehandler::NewLine();
                 $line .= "Allow from all" . fs_filehandler::NewLine();
@@ -332,7 +339,8 @@ function WriteVhostConfigFile()
 
                 // Directory options
                 $line .= "<Directory />" . fs_filehandler::NewLine();
-                $line .= "Options FollowSymLinks Indexes" . fs_filehandler::NewLine();
+                $line .= "Options +FollowSymLinks +Indexes" . fs_filehandler::NewLine();
+                $line .= "Require all granted" . fs_filehandler::NewLine();
                 $line .= "AllowOverride All" . fs_filehandler::NewLine();
                 $line .= "Order Allow,Deny" . fs_filehandler::NewLine();
                 $line .= "Allow from all" . fs_filehandler::NewLine();
@@ -410,7 +418,8 @@ function WriteVhostConfigFile()
             $line .= "ServerAdmin " . $useremail . fs_filehandler::NewLine();
             $line .= "DocumentRoot \"" . ctrl_options::GetSystemOption( 'static_dir' ) . "disabled\"" . fs_filehandler::NewLine();
             $line .= "<Directory />" . fs_filehandler::NewLine();
-            $line .= "Options FollowSymLinks Indexes" . fs_filehandler::NewLine();
+            $line .= "Options +FollowSymLinks +Indexes" . fs_filehandler::NewLine();
+            $line .= "Require all granted" . fs_filehandler::NewLine();
             $line .= "AllowOverride All" . fs_filehandler::NewLine();
             $line .= "Order Allow,Deny" . fs_filehandler::NewLine();
             $line .= "Allow from all" . fs_filehandler::NewLine();

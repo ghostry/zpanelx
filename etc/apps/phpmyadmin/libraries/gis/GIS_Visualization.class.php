@@ -23,7 +23,7 @@ class PMA_GIS_Visualization
     private $_data;
 
     /**
-     * @var array   Set of default settigs values are here.
+     * @var array   Set of default settings values are here.
      */
     private $_settings = array(
 
@@ -128,12 +128,13 @@ class PMA_GIS_Visualization
 
         // Check if the user already added extension;
         // get the substring where the extension would be if it was included
-        $extension_start_pos = strlen($file_name) - strlen($ext) - 1;
-        $user_extension = substr(
-            $file_name, $extension_start_pos, strlen($file_name)
+        $extension_start_pos = /*overload*/mb_strlen($file_name)
+            - /*overload*/mb_strlen($ext) - 1;
+        $user_extension = /*overload*/mb_substr(
+            $file_name, $extension_start_pos, /*overload*/mb_strlen($file_name)
         );
         $required_extension = "." . $ext;
-        if (strtolower($user_extension) != $required_extension) {
+        if (/*overload*/mb_strtolower($user_extension) != $required_extension) {
             $file_name  .= $required_extension;
         }
         return $file_name;
@@ -374,8 +375,8 @@ class PMA_GIS_Visualization
 
             // Figure out the data type
             $ref_data = $row[$this->_settings['spatialColumn']];
-            $type_pos = stripos($ref_data, '(');
-            $type = substr($ref_data, 0, $type_pos);
+            $type_pos = /*overload*/mb_stripos($ref_data, '(');
+            $type = /*overload*/mb_substr($ref_data, 0, $type_pos);
 
             $gis_obj = PMA_GIS_Factory::factory($type);
             if (! $gis_obj) {
@@ -385,7 +386,7 @@ class PMA_GIS_Visualization
                 $row[$this->_settings['spatialColumn']]
             );
 
-            // Upadate minimum/maximum values for x and y cordinates.
+            // Update minimum/maximum values for x and y coordinates.
             $c_maxX = (float) $scale_data['maxX'];
             if (! isset($min_max['maxX']) || $c_maxX > $min_max['maxX']) {
                 $min_max['maxX'] = $c_maxX;
@@ -443,7 +444,7 @@ class PMA_GIS_Visualization
      *
      * @param array  $data       Raw data
      * @param array  $scale_data Data related to scaling
-     * @param string $format     Format of the visulaization
+     * @param string $format     Format of the visualization
      * @param object $results    Image object in the case of png
      *                           TCPDF object in the case of pdf
      *
@@ -460,8 +461,8 @@ class PMA_GIS_Visualization
 
             // Figure out the data type
             $ref_data = $row[$this->_settings['spatialColumn']];
-            $type_pos = stripos($ref_data, '(');
-            $type = substr($ref_data, 0, $type_pos);
+            $type_pos = /*overload*/mb_stripos($ref_data, '(');
+            $type = /*overload*/mb_substr($ref_data, 0, $type_pos);
 
             $gis_obj = PMA_GIS_Factory::factory($type);
             if (! $gis_obj) {

@@ -19,9 +19,6 @@ class webservice extends ws_xmws {
         $response_xml = ws_xmws::NewXMLContentSection('portstatus', array(
                     'web' => (module_controller::getIsWebServerUp() == '' ? 0 : 1),
                     'ftp' => (module_controller::getIsFTPUp() == '' ? 0 : 1),
-                    'pop3' => (module_controller::getIsPOP3Up() == '' ? 0 : 1),
-                    'imap' => (module_controller::getIsIMAPUp() == '' ? 0 : 1),
-                    'smtp' => (module_controller::getIsSMTPUp() == '' ? 0 : 1),
                     'mysql' => (module_controller::getIsMySQLUp() == '' ? 0 : 1),
                 ));
         $response_xml .= ws_xmws::NewXMLTag('serveruptime', sys_monitoring::ServerUptime());

@@ -57,58 +57,10 @@ class module_controller extends ctrl_module
         $line .= "</td>";
         $line .= "</tr>";
         $line .= "<tr>";
-        $line .= "<th>SMTP</th>";
-        $line .= "<td>";
-
-        if (fs_director::CheckForEmptyValue(sys_monitoring::PortStatus(25))) {
-            $line .= "<img src=\"modules/" . $controller->GetControllerRequest('URL', 'module') . "/assets/down.gif\">";
-        } else {
-            $line .= "<img src=\"modules/" . $controller->GetControllerRequest('URL', 'module') . "/assets/up.gif\">";
-        }
-
-        $line .= "</td>";
-        $line .= "</tr>";
-        $line .= "<tr>";
-        $line .= "<th>POP3</th>";
-        $line .= "<td>";
-
-        if (fs_director::CheckForEmptyValue(sys_monitoring::PortStatus(110))) {
-            $line .= "<img src=\"modules/" . $controller->GetControllerRequest('URL', 'module') . "/assets/down.gif\">";
-        } else {
-            $line .= "<img src=\"modules/" . $controller->GetControllerRequest('URL', 'module') . "/assets/up.gif\">";
-        }
-
-        $line .= "</td>";
-        $line .= "</tr>";
-        $line .= "<tr>";
-        $line .= "<th>IMAP</th>";
-        $line .= "<td>";
-
-        if (fs_director::CheckForEmptyValue(sys_monitoring::PortStatus(143))) {
-            $line .= "<img src=\"modules/" . $controller->GetControllerRequest('URL', 'module') . "/assets/down.gif\">";
-        } else {
-            $line .= "<img src=\"modules/" . $controller->GetControllerRequest('URL', 'module') . "/assets/up.gif\">";
-        }
-
-        $line .= "</td>";
-        $line .= "</tr>";
-        $line .= "<tr>";
         $line .= "<th>MySQL</th>";
         $line .= "<td>";
         /* MySQL has to be on-line as you are viewing this page, we made this 'static' to save on port queries (saves time) amongst other reasons. */
         $line .= "<img src=\"modules/" . $controller->GetControllerRequest('URL', 'module') . "/assets/up.gif\">";
-
-        $line .= "</td>";
-        $line .= "</tr>";
-        $line .= "<tr>";
-        $line .= "<th>DNS</th>";
-        $line .= "<td>";
-
-        if (fs_director::CheckForEmptyValue(sys_monitoring::PortStatus(53))) {
-            $line .= "<img src=\"modules/" . $controller->GetControllerRequest('URL', 'module') . "/assets/down.gif\">";
-        } else {
-            $line .= "<img src=\"modules/" . $controller->GetControllerRequest('URL', 'module') . "/assets/up.gif\">";
-        }
 
         $line .= "</td>";
         $line .= "</tr>";
@@ -131,21 +83,6 @@ class module_controller extends ctrl_module
     static function getIsFTPUp()
     {
         return sys_monitoring::PortStatus(21);
-    }
-
-    static function getIsSMTPUp()
-    {
-        return sys_monitoring::PortStatus(25);
-    }
-
-    static function getIsPOP3Up()
-    {
-        return sys_monitoring::PortStatus(110);
-    }
-
-    static function getIsIMAPUp()
-    {
-        return sys_monitoring::PortStatus(143);
     }
 
     static function getUptime()

@@ -186,12 +186,8 @@ class module_controller extends ctrl_module
                 module_controller::build_row_usage('Bandwidth', self::$bandwidth, (self::$bandwidthquota == 0) ? -1 : self::$bandwidthquota, true) .
                 module_controller::build_row_usage('Domains', self::$domains, self::$domainsquota) .
                 module_controller::build_row_usage('Sub-domains', self::$subdomains, self::$subdomainsquota) .
-                module_controller::build_row_usage('Parked domains', self::$parkeddomains, self::$parkeddomainsquota) .
                 module_controller::build_row_usage('FTP accounts', self::$ftpaccounts, self::$ftpaccountsquota) .
                 module_controller::build_row_usage('MySQL&reg databases', self::$mysql, self::$mysqlquota) .
-                module_controller::build_row_usage('Mailboxes', self::$mailboxes, self::$mailboxquota) .
-                module_controller::build_row_usage('Mail forwarders', self::$forwarders, self::$forwardersquota) .
-                module_controller::build_row_usage('Distribution lists', self::$distlists, self::$distlistsquota) .
                 '</table>' .
                 '</td>' .
                 '</tr>' .

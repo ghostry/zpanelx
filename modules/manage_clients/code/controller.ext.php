@@ -24,8 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-class module_controller extends ctrl_module
-{
+class module_controller extends ctrl_module {
 
     static $complete;
     static $error;
@@ -39,6 +38,7 @@ class module_controller extends ctrl_module
     static $packageblank;
     static $groupblank;
     static $ok;
+    static $cannotsendemail;
     static $edit;
     static $clientid;
     static $clientpkgid;
@@ -48,8 +48,7 @@ class module_controller extends ctrl_module
     /**
      * The 'worker' methods.
      */
-    static function ListClients($uid = 0)
-    {
+    static function ListClients($uid = 0) {
         global $zdbh;
         if ($uid == 0) {
             $sql = "SELECT * FROM x_accounts WHERE ac_enabled_in=1 AND ac_deleted_ts IS NULL";
@@ -95,8 +94,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function ListAllClients($moveid, $uid)
-    {
+    static function ListAllClients($moveid, $uid) {
         global $zdbh;
         $sql = "SELECT * FROM x_accounts WHERE ac_reseller_fk=:uid AND ac_deleted_ts IS NULL";
         $numrows = $zdbh->prepare($sql);
@@ -126,8 +124,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function ListDisabledClients($uid)
-    {
+    static function ListDisabledClients($uid) {
         global $zdbh;
         $sql = "SELECT * FROM x_accounts WHERE ac_reseller_fk=:uid AND ac_enabled_in=0 AND ac_deleted_ts IS NULL";
         //$numrows = $zdbh->query($sql);
@@ -155,8 +152,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function ListCurrentClient($uid)
-    {
+    static function ListCurrentClient($uid) {
         global $zdbh;
         $sql = "SELECT * FROM x_profiles WHERE ud_user_fk=:uid";
         //$numrows = $zdbh->query($sql);
@@ -185,8 +181,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function ListGroups($uid)
-    {
+    static function ListGroups($uid) {
         global $zdbh;
         $currentuser = ctrl_users::GetUserDetail($uid);
         $sql = "SELECT * FROM x_groups WHERE ug_reseller_fk=:resellerid";
@@ -222,8 +217,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function ListCurrentGroups($uid, $rid, $id)
-    {
+    static function ListCurrentGroups($uid, $rid, $id) {
         global $zdbh;
         $sql = "SELECT * FROM x_groups WHERE ug_reseller_fk=:rid";
         //$numrows = $zdbh->query($sql);
@@ -264,8 +258,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function ListPackages($uid)
-    {
+    static function ListPackages($uid) {
         global $zdbh;
         $sql = "SELECT * FROM x_packages WHERE pk_reseller_fk=:uid AND pk_deleted_ts IS NULL";
         //$numrows = $zdbh->query($sql);
@@ -287,8 +280,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function ListCurrentPackages($uid, $rid)
-    {
+    static function ListCurrentPackages($uid, $rid) {
         global $zdbh;
         $sql = "SELECT * FROM x_packages WHERE pk_reseller_fk=:rid AND pk_deleted_ts IS NULL";
         //$numrows = $zdbh->query($sql);
@@ -316,8 +308,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function SetClientAccount($userid, $column, $value)
-    {
+    static function SetClientAccount($userid, $column, $value) {
         global $zdbh;
         runtime_hook::Execute('OnBeforeSetClientAccount');
         $sql = $zdbh->prepare("UPDATE x_accounts
@@ -331,8 +322,7 @@ class module_controller extends ctrl_module
         return true;
     }
 
-    static function SetClientProfile($userid, $column, $value)
-    {
+    static function SetClientProfile($userid, $column, $value) {
         global $zdbh;
         runtime_hook::Execute('OnBeforeSetClientProfile');
         $sql = $zdbh->prepare("UPDATE x_profiles SET :column=:value WHERE ud_user_fk=:userid");
@@ -344,8 +334,7 @@ class module_controller extends ctrl_module
         return true;
     }
 
-    static function ExecuteDeleteClient($userid, $moveid)
-    {
+    static function ExecuteDeleteClient($userid, $moveid) {
         global $zdbh;
         runtime_hook::Execute('OnBeforeDeleteClient');
         $sql = $zdbh->prepare("
@@ -382,8 +371,7 @@ class module_controller extends ctrl_module
         return true;
     }
 
-    static function ExecuteUpdateClient($clientid, $package, $enabled, $group, $fullname, $email, $address, $post, $phone, $newpass)
-    {
+    static function ExecuteUpdateClient($clientid, $package, $enabled, $group, $fullname, $email, $address, $post, $phone, $newpass) {
         global $zdbh;
         runtime_hook::Execute('OnBeforeUpdateClient');
         if ($newpass != "") {
@@ -434,8 +422,7 @@ class module_controller extends ctrl_module
         return true;
     }
 
-    static function EnableClient($userid)
-    {
+    static function EnableClient($userid) {
         runtime_hook::Execute('OnBeforeEnableClient');
         global $zdbh;
         $sql = $zdbh->prepare("UPDATE x_accounts SET ac_enabled_in=1 WHERE ac_id_pk=:userid");
@@ -445,8 +432,7 @@ class module_controller extends ctrl_module
         return true;
     }
 
-    static function DisableClient($userid)
-    {
+    static function DisableClient($userid) {
         runtime_hook::Execute('OnBeforeDisableClient');
         global $zdbh;
         $sql = $zdbh->prepare("UPDATE x_accounts SET ac_enabled_in=0 WHERE ac_id_pk=:userid");
@@ -456,8 +442,7 @@ class module_controller extends ctrl_module
         return true;
     }
 
-    static function CheckEnabledHTML($userid)
-    {
+    static function CheckEnabledHTML($userid) {
         $currentuser = ctrl_users::GetUserDetail($userid);
         $res = array();
         if ($currentuser['enabled'] == 1) {
@@ -472,8 +457,7 @@ class module_controller extends ctrl_module
         return $res;
     }
 
-    static function CheckHasPackage($userid)
-    {
+    static function CheckHasPackage($userid) {
         global $zdbh;
         $sql = "SELECT COUNT(*) FROM x_packages WHERE pk_reseller_fk=:userid AND pk_deleted_ts IS NULL";
         $numrows = $zdbh->prepare($sql);
@@ -487,8 +471,7 @@ class module_controller extends ctrl_module
         return true;
     }
 
-    static function ExecuteCreateClient($uid, $username, $packageid, $groupid, $fullname, $email, $address, $post, $phone, $password, $sendemail, $emailsubject, $emailbody)
-    {
+    static function ExecuteCreateClient($uid, $username, $packageid, $groupid, $fullname, $email, $address, $post, $phone, $password, $sendemail, $emailsubject, $emailbody) {
         global $zdbh;
         // Check for spaces and remove if found...
         $username = strtolower(str_replace(' ', '', $username));
@@ -578,8 +561,7 @@ class module_controller extends ctrl_module
         return true;
     }
 
-    static function CheckCreateForErrors($username, $packageid, $groupid, $email, $password = "")
-    {
+    static function CheckCreateForErrors($username, $packageid, $groupid, $email, $password = "") {
         global $zdbh;
         $username = strtolower(str_replace(' ', '', $username));
         // Check to make sure the username is not blank or exists before we go any further...
@@ -672,24 +654,21 @@ class module_controller extends ctrl_module
         return true;
     }
 
-    static function IsValidEmail($email)
-    {
+    static function IsValidEmail($email) {
         if (!preg_match('/^[a-z0-9]+([_\+\\.-][a-z0-9]+)*@([a-z0-9]+([\.-][a-z0-9]+)*)+\\.[a-z]{2,}$/i', $email)) {
             return false;
         }
         return true;
     }
 
-    static function IsValidUserName($username)
-    {
+    static function IsValidUserName($username) {
         if (!preg_match('/^[a-z\d][a-z\d-]{0,62}$/i', $username) || preg_match('/-$/', $username)) {
             return false;
         }
         return true;
     }
 
-    static function DefaultEmailBody()
-    {
+    static function DefaultEmailBody() {
         $line = ui_language::translate("Hi {{fullname}},\r\rWe are pleased to inform you that your new hosting account is now active!\r\rYou can access your web hosting control panel using this link:\r{{controlpanelurl}}\r\rYour username and password is as follows:\rUsername: {{username}}\rPassword: {{password}}\r\rMany thanks,\rThe management");
         return $line;
     }
@@ -700,8 +679,7 @@ class module_controller extends ctrl_module
      * @param type $username The username to check against.
      * @return boolean
      */
-    static function CheckUserExits($username)
-    {
+    static function CheckUserExits($username) {
         global $zdbh;
         $sql = "SELECT COUNT(*) FROM x_accounts WHERE LOWER(ac_user_vc)=:username";
         $uniqueuser = $zdbh->prepare($sql);
@@ -724,8 +702,7 @@ class module_controller extends ctrl_module
     /**
      * Webinterface sudo methods.
      */
-    static function doCreateClient()
-    {
+    static function doCreateClient() {
         global $controller;
         runtime_csfr::Protect();
         $currentuser = ctrl_users::GetUserDetail();
@@ -735,6 +712,10 @@ class module_controller extends ctrl_module
         } else {
             $sendemail = 0;
         }
+        if (ctrl_options::GetSystemOption('smtp_server') == '') {
+            $sendemail = 0;
+            self::$cannotsendemail = true;
+        }
         if (self::ExecuteCreateClient($currentuser['userid'], $formvars['inNewUserName'], $formvars['inNewPackage'], $formvars['inNewGroup'], $formvars['inNewFullName'], $formvars['inNewEmailAddress'], $formvars['inNewAddress'], $formvars['inNewPostCode'], $formvars['inNewPhone'], $formvars['inNewPassword'], $sendemail, $formvars['inEmailSubject'], $formvars['inEmailBody'])) {
             unset($_POST['inNewUserName']);
             return true;
@@ -743,8 +724,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function doEditClient()
-    {
+    static function doEditClient() {
         global $controller;
         runtime_csfr::Protect();
         $currentuser = ctrl_users::GetUserDetail();
@@ -762,8 +742,7 @@ class module_controller extends ctrl_module
         return;
     }
 
-    static function doEditDisabledClient()
-    {
+    static function doEditDisabledClient() {
         global $controller;
         runtime_csfr::Protect();
         $currentuser = ctrl_users::GetUserDetail();
@@ -781,8 +760,7 @@ class module_controller extends ctrl_module
         return;
     }
 
-    static function doDeleteClient()
-    {
+    static function doDeleteClient() {
         global $controller;
         runtime_csfr::Protect();
         $formvars = $controller->GetAllControllerRequests('FORM');
@@ -791,8 +769,7 @@ class module_controller extends ctrl_module
         return false;
     }
 
-    static function doUpdateClient()
-    {
+    static function doUpdateClient() {
         global $controller;
         runtime_csfr::Protect();
         $currentuser = ctrl_users::GetUserDetail();
@@ -802,8 +779,7 @@ class module_controller extends ctrl_module
         return false;
     }
 
-    static function getClientList()
-    {
+    static function getClientList() {
         $currentuser = ctrl_users::GetUserDetail();
         $clientlist = self::ListClients($currentuser['userid']);
         if (!fs_director::CheckForEmptyValue($clientlist)) {
@@ -813,8 +789,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getAllClientList()
-    {
+    static function getAllClientList() {
         global $controller;
         $currentuser = ctrl_users::GetUserDetail();
         $urlvars = $controller->GetAllControllerRequests('URL');
@@ -826,8 +801,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getDisabledClientList()
-    {
+    static function getDisabledClientList() {
         $currentuser = ctrl_users::GetUserDetail();
         $disabledclientlist = self::ListDisabledClients($currentuser['userid']);
         if (!fs_director::CheckForEmptyValue($disabledclientlist)) {
@@ -837,8 +811,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getCurrentClient()
-    {
+    static function getCurrentClient() {
         global $controller;
         $urlvars = $controller->GetAllControllerRequests('URL');
         $client = self::ListCurrentClient($urlvars['other']);
@@ -849,56 +822,48 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getGroupList()
-    {
+    static function getGroupList() {
         global $controller;
         $currentuser = ctrl_users::GetUserDetail();
         return self::ListGroups($currentuser['userid']);
     }
 
-    static function getCurrentGroupList()
-    {
+    static function getCurrentGroupList() {
         global $controller;
         $currentuser = ctrl_users::GetUserDetail();
         return self::ListCurrentGroups($controller->GetControllerRequest('URL', 'other'), $currentuser['resellerid'], $currentuser['userid']);
     }
 
-    static function getPackageList()
-    {
+    static function getPackageList() {
         global $controller;
         $currentuser = ctrl_users::GetUserDetail();
         return self::ListPackages($currentuser['userid']);
     }
 
-    static function getCurrentPackageList()
-    {
+    static function getCurrentPackageList() {
         global $controller;
         $currentuser = ctrl_users::GetUserDetail();
         return self::ListCurrentPackages($controller->GetControllerRequest('URL', 'other'), $currentuser['userid']);
     }
 
-    static function getCheckEnabledHTML()
-    {
+    static function getCheckEnabledHTML() {
         global $controller;
         return self::CheckEnabledHTML($controller->GetControllerRequest('URL', 'other'));
     }
 
-    static function getHasPackage()
-    {
+    static function getHasPackage() {
         global $controller;
         $currentuser = ctrl_users::GetUserDetail();
         return self::CheckHasPackage($currentuser['userid']);
     }
 
-    static function getIsReseller()
-    {
+    static function getIsReseller() {
         global $controller;
         $currentuser = ctrl_users::GetUserDetail();
         return self::CheckHasPackage($currentuser['userid']);
     }
 
-    static function getisCreateClient()
-    {
+    static function getisCreateClient() {
         global $controller;
         $urlvars = $controller->GetAllControllerRequests('URL');
         if (!isset($urlvars['show']))
@@ -906,8 +871,7 @@ class module_controller extends ctrl_module
         return false;
     }
 
-    static function getisDeleteClient()
-    {
+    static function getisDeleteClient() {
         global $controller;
         $urlvars = $controller->GetAllControllerRequests('URL');
         if ((isset($urlvars['show'])) && ($urlvars['show'] == "Delete"))
@@ -915,8 +879,7 @@ class module_controller extends ctrl_module
         return false;
     }
 
-    static function getisEditClient()
-    {
+    static function getisEditClient() {
         global $controller;
         $urlvars = $controller->GetAllControllerRequests('URL');
         if ((isset($urlvars['show'])) && ($urlvars['show'] == "Edit")) {
@@ -926,8 +889,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getEditCurrentName()
-    {
+    static function getEditCurrentName() {
         global $controller;
         if ($controller->GetControllerRequest('URL', 'other')) {
             $current = self::ListCurrentClient($controller->GetControllerRequest('URL', 'other'));
@@ -937,8 +899,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getEditCurrentEmail()
-    {
+    static function getEditCurrentEmail() {
         global $controller;
         if ($controller->GetControllerRequest('URL', 'other')) {
             $current = self::ListCurrentClient($controller->GetControllerRequest('URL', 'other'));
@@ -948,8 +909,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getEditCurrentFullName()
-    {
+    static function getEditCurrentFullName() {
         global $controller;
         if ($controller->GetControllerRequest('URL', 'other')) {
             $current = self::ListCurrentClient($controller->GetControllerRequest('URL', 'other'));
@@ -959,8 +919,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getEditCurrentPost()
-    {
+    static function getEditCurrentPost() {
         global $controller;
         if ($controller->GetControllerRequest('URL', 'other')) {
             $current = self::ListCurrentClient($controller->GetControllerRequest('URL', 'other'));
@@ -970,8 +929,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getEditCurrentID()
-    {
+    static function getEditCurrentID() {
         global $controller;
         if ($controller->GetControllerRequest('URL', 'other')) {
             $current = self::ListCurrentClient($controller->GetControllerRequest('URL', 'other'));
@@ -981,8 +939,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getEditCurrentAddress()
-    {
+    static function getEditCurrentAddress() {
         global $controller;
         if ($controller->GetControllerRequest('URL', 'other')) {
             $current = self::ListCurrentClient($controller->GetControllerRequest('URL', 'other'));
@@ -992,8 +949,7 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getEditCurrentPhone()
-    {
+    static function getEditCurrentPhone() {
         global $controller;
         if ($controller->GetControllerRequest('URL', 'other')) {
             $current = self::ListCurrentClient($controller->GetControllerRequest('URL', 'other'));
@@ -1003,17 +959,15 @@ class module_controller extends ctrl_module
         }
     }
 
-    static function getDefaultEmailBody()
-    {
+    static function getDefaultEmailBody() {
         global $controller;
-        if ($emailBodyFromSetting = ctrl_options::GetSystemOption('defaultEmailBody')){
+        if ($emailBodyFromSetting = ctrl_options::GetSystemOption('defaultEmailBody')) {
             return $emailBodyFromSetting;
         }
         return self::DefaultEmailBody();
     }
 
-    static function getFormName()
-    {
+    static function getFormName() {
         global $controller;
         $formvars = $controller->GetAllControllerRequests('FORM');
         if (isset($formvars['inNewUserName']) && fs_director::CheckForEmptyValue(self::$resetform)) {
@@ -1022,8 +976,7 @@ class module_controller extends ctrl_module
         return;
     }
 
-    static function getFormFullName()
-    {
+    static function getFormFullName() {
         global $controller;
         $formvars = $controller->GetAllControllerRequests('FORM');
         if (isset($formvars['inNewFullName']) && fs_director::CheckForEmptyValue(self::$resetform)) {
@@ -1032,8 +985,7 @@ class module_controller extends ctrl_module
         return;
     }
 
-    static function getFormEmail()
-    {
+    static function getFormEmail() {
         global $controller;
         $formvars = $controller->GetAllControllerRequests('FORM');
         if (isset($formvars['inNewEmailAddress']) && fs_director::CheckForEmptyValue(self::$resetform)) {
@@ -1042,8 +994,7 @@ class module_controller extends ctrl_module
         return;
     }
 
-    static function getFormAddress()
-    {
+    static function getFormAddress() {
         global $controller;
         $formvars = $controller->GetAllControllerRequests('FORM');
         if (isset($formvars['inNewAddress']) && fs_director::CheckForEmptyValue(self::$resetform)) {
@@ -1052,8 +1003,7 @@ class module_controller extends ctrl_module
         return;
     }
 
-    static function getFormPost()
-    {
+    static function getFormPost() {
         global $controller;
         $formvars = $controller->GetAllControllerRequests('FORM');
         if (isset($formvars['inNewPostCode']) && fs_director::CheckForEmptyValue(self::$resetform)) {
@@ -1062,8 +1012,7 @@ class module_controller extends ctrl_module
         return;
     }
 
-    static function getFormPhone()
-    {
+    static function getFormPhone() {
         global $controller;
         $formvars = $controller->GetAllControllerRequests('FORM');
         if (isset($formvars['inNewPhone']) && fs_director::CheckForEmptyValue(self::$resetform)) {
@@ -1072,8 +1021,7 @@ class module_controller extends ctrl_module
         return;
     }
 
-    static function getRandomPassword()
-    {
+    static function getRandomPassword() {
         $minpasswordlength = ctrl_options::GetSystemOption('password_minlength');
         $trylength = 9;
         if ($trylength < $minpasswordlength) {
@@ -1085,8 +1033,7 @@ class module_controller extends ctrl_module
         return $password;
     }
 
-    static function getMinPassLength()
-    {
+    static function getMinPassLength() {
         $minpasswordlength = ctrl_options::GetSystemOption('password_minlength');
         $trylength = 9;
         if ($trylength < $minpasswordlength) {
@@ -1097,8 +1044,7 @@ class module_controller extends ctrl_module
         return $uselength;
     }
 
-    static function getResult()
-    {
+    static function getResult() {
         if (!fs_director::CheckForEmptyValue(self::$userblank)) {
             return ui_sysmessage::shout(ui_language::translate("You need to specify a username to create a new client."), "zannounceerror");
         }
@@ -1126,6 +1072,9 @@ class module_controller extends ctrl_module
         if (!fs_director::CheckForEmptyValue(self::$alreadyexists)) {
             return ui_sysmessage::shout(ui_language::translate("A client with that name already appears to exsist on this server."), "zannounceerror");
         }
+        if (!fs_director::CheckForEmptyValue(self::$cannotsendemail)) {
+            return ui_sysmessage::shout(ui_language::translate("Changes to your client(s) have been saved successfully! But can't send welcome email."), "zannounceok");
+        }
         if (!fs_director::CheckForEmptyValue(self::$ok)) {
             return ui_sysmessage::shout(ui_language::translate("Changes to your client(s) have been saved successfully!"), "zannounceok");
         }
@@ -1139,3 +1088,4 @@ class module_controller extends ctrl_module
      * Webinterface sudo methods.
      */
 }
+

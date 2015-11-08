@@ -11,6 +11,10 @@
  */
 define('PMA_MINIMUM_COMMON', true);
 require_once './libraries/common.inc.php';
+/**
+ * JavaScript escaping.
+ */
+require_once './libraries/js_escape.lib.php';
 
 if (! PMA_isValid($_GET['url'])
     || ! preg_match('/^https?:\/\/[^\n\r]*$/', $_GET['url'])
@@ -24,11 +28,12 @@ if (! PMA_isValid($_GET['url'])
     //  external site.
     echo "<script type='text/javascript'>
             window.onload=function(){
-                window.location='" . htmlspecialchars($_GET['url']) . "';
+                window.location='" . PMA_escapeJsString($_GET['url']) . "';
             }
         </script>";
     // Display redirecting msg on screen.
-    printf(__('Taking you to %s.'), htmlspecialchars($_GET['url']));
+    // Do not display the value of $_GET['url'] to avoid showing injected content
+    echo __('Taking you to the target site.');
 }
 die();
 ?>

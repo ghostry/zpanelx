@@ -3,7 +3,7 @@
 /**
  *
  * ZPanel - A Cross-Platform Open-Source Web Hosting Control panel.
- * 
+ *
  * @package ZPanel
  * @version $Id$
  * @author Bobby Allen - ballen@bobbyallen.me
@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-echo "<script src=\"http://code.jquery.com/jquery-latest.js\"></script>";
 set_time_limit(0);
 ini_set('memory_limit', '256M');
 require('../../../cnf/db.php');
@@ -42,6 +41,44 @@ try {
 } catch (PDOException $e) {
     exit();
 }
+if (isset($_GET['down'])) {
+    session_start();
+    if ($_SESSION['zpuid'] == $_GET['id']) {
+        $backupname = $_GET['down'];
+        $userid = $_GET['id'];
+        $rows = $zdbh->prepare("
+	    	SELECT * FROM x_accounts
+	        LEFT JOIN x_profiles ON (x_accounts.ac_id_pk=x_profiles.ud_user_fk)
+	        LEFT JOIN x_groups   ON (x_accounts.ac_group_fk=x_groups.ug_id_pk)
+	        LEFT JOIN x_packages ON (x_accounts.ac_package_fk=x_packages.pk_id_pk)
+	        LEFT JOIN x_quotas   ON (x_accounts.ac_package_fk=x_quotas.qt_package_fk)
+	        WHERE x_accounts.ac_id_pk= :userid
+	        ");
+        $rows->bindParam(':userid', $userid);
+        $rows->execute();
+        $dbvals = $rows->fetch();
+
+        $homedir = ctrl_options::GetSystemOption('hosted_dir') . $dbvals['ac_user_vc'];
+        $backupdir = $homedir . "/backups/";
+        $file = $backupdir . $backupname;
+        //exit($file);
+        header('Pragma: public');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Cache-Control: private', false);
+        header('Content-Description: File Transfer');
+        header('Content-Transfer-Encoding: binary');
+        header('Content-Type: application/force-download');
+        header('Content-Length: ' . filesize($file));
+        header('Content-Disposition: attachment; filename=' . $backupname);
+        readfile_chunked($file);
+    } else {
+        echo "<h2>Unauthorized Access!</h2>";
+        echo "You have no permission to view this module.";
+    }
+    exit;
+}
+echo "<script src=\"http://code.jquery.com/jquery-latest.js\"></script>";
 if (isset($_POST['inDownLoad'])) {
     $download = $_POST['inDownLoad'];
 } else {
@@ -52,11 +89,11 @@ if (isset($_GET['id']) && $_GET['id'] != "") {
     if ($_SESSION['zpuid'] == $_GET['id']) {
         $userid = $_GET['id'];
         $rows = $zdbh->prepare("
-	    	SELECT * FROM x_accounts 
-	        LEFT JOIN x_profiles ON (x_accounts.ac_id_pk=x_profiles.ud_user_fk) 
-	        LEFT JOIN x_groups   ON (x_accounts.ac_group_fk=x_groups.ug_id_pk) 
-	        LEFT JOIN x_packages ON (x_accounts.ac_package_fk=x_packages.pk_id_pk) 
-	        LEFT JOIN x_quotas   ON (x_accounts.ac_package_fk=x_quotas.qt_package_fk) 
+	    	SELECT * FROM x_accounts
+	        LEFT JOIN x_profiles ON (x_accounts.ac_id_pk=x_profiles.ud_user_fk)
+	        LEFT JOIN x_groups   ON (x_accounts.ac_group_fk=x_groups.ug_id_pk)
+	        LEFT JOIN x_packages ON (x_accounts.ac_package_fk=x_packages.pk_id_pk)
+	        LEFT JOIN x_quotas   ON (x_accounts.ac_package_fk=x_quotas.qt_package_fk)
 	        WHERE x_accounts.ac_id_pk= :userid
 	        ");
         $rows->bindParam(':userid', $userid);
@@ -65,7 +102,7 @@ if (isset($_GET['id']) && $_GET['id'] != "") {
 
         if ($backup = ExecuteBackup($userid, $dbvals['ac_user_vc'], $download)) {
             echo "<p>Ready to download file: <b>" . basename($backup) . "<b></p>";
-            echo "<button class=\"fg-button ui-state-default ui-corner-all\" type=\"button\" onclick=\"window.location.href='../../../etc/tmp/" . basename($backup) . "';return false;\">Download Now</button>";
+            echo "<button class=\"fg-button ui-state-default ui-corner-all\" type=\"button\" onclick=\"window.location.href='dobackup.php?id=" . $userid . "&down=" . basename($backup) . "';return false;\">Download Now</button>";
             echo "<button class=\"fg-button ui-state-default ui-corner-all\" type=\"button\" value=\"Close Window\" onClick=\"return window.close()\">Close Window</button>";
         } else {
             echo "Could not find user!";
@@ -173,9 +210,10 @@ function ExecuteBackup($userid, $username, $download = 0) {
               }
              */
             fs_director::SetFileSystemPermissions($backupdir . $backupname . ".zip", 0777);
-            return $temp_dir . $backupname . ".zip";
+            //return $temp_dir . $backupname . ".zip";
         }
         unlink($temp_dir . $backupname . ".zip");
+        return $backupname . ".zip";
     } else {
         echo "File not found in temp directory!";
         return FALSE;
@@ -197,4 +235,3 @@ function readfile_chunked($filename) {
     return fclose($handle);
 }
 
-?>
